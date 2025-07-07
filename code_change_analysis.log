@@ -1,0 +1,103 @@
+2025-07-03 11:30:46,204 - __main__ - INFO - Starting MCP server...
+2025-07-03 11:34:29,058 - __main__ - INFO - Starting MCP server...
+2025-07-07 09:06:43,956 - __main__ - INFO - Starting MCP server...
+2025-07-07 09:06:43,957 - __main__ - INFO - Handling request: initialize
+2025-07-07 09:06:43,957 - __main__ - INFO - Handling initialize request
+2025-07-07 09:06:48,903 - __main__ - INFO - Starting MCP server...
+2025-07-07 09:06:48,904 - __main__ - INFO - Handling request: tools/list
+2025-07-07 09:06:53,386 - __main__ - INFO - Starting MCP server...
+2025-07-07 09:06:53,387 - __main__ - INFO - Handling request: initialize
+2025-07-07 09:06:53,387 - __main__ - INFO - Handling initialize request
+2025-07-07 09:06:53,387 - __main__ - INFO - Handling request: tools/list
+2025-07-07 09:06:59,021 - __main__ - INFO - Starting MCP server...
+2025-07-07 09:06:59,022 - __main__ - INFO - Handling request: initialize
+2025-07-07 09:06:59,022 - __main__ - INFO - Handling initialize request
+2025-07-07 09:06:59,022 - __main__ - INFO - Handling request: tools/call
+2025-07-07 09:28:57,859 - __main__ - INFO - Starting MCP server...
+2025-07-07 09:28:57,864 - __main__ - INFO - Handling request: initialize
+2025-07-07 09:28:57,868 - __main__ - INFO - Handling initialize request
+2025-07-07 09:28:57,869 - __main__ - INFO - Handling request: tools/call
+2025-07-07 09:28:57,870 - plugin - ERROR - Analysis failed: EOF when reading a line
+Traceback (most recent call last):
+  File "/home/kotei/work/neo4j-graphrag-python/mcp_plugin/plugin.py", line 78, in analyze_code_changes
+    results = await run_analysis()
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/home/kotei/work/neo4j-graphrag-python/extensions/run_analysis.py", line 598, in main
+    check_environment()
+  File "/home/kotei/work/neo4j-graphrag-python/extensions/run_analysis.py", line 41, in check_environment
+    response = input("   Continue anyway? (y/N): ")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+EOFError: EOF when reading a line
+2025-07-07 09:34:11,099 - __main__ - INFO - Starting MCP server...
+2025-07-07 09:34:11,101 - __main__ - INFO - Handling request: initialize
+2025-07-07 09:34:11,102 - __main__ - INFO - Handling initialize request
+2025-07-07 09:34:11,102 - __main__ - INFO - Handling request: tools/call
+2025-07-07 09:34:11,103 - main_analyzer - INFO - Starting code change analysis...
+2025-07-07 09:34:11,103 - main_analyzer - INFO - 🔍 Analyzing only the latest commit
+2025-07-07 09:34:11,103 - main_analyzer - INFO - 🤖 LLM-enhanced analysis enabled
+2025-07-07 09:34:11,206 - pipelines.code_change_analyzer - WARNING - Failed to initialize LLM: Unknown scheme for proxy URL URL('socks://127.0.0.1:7891/')
+2025-07-07 09:34:11,206 - pipelines.code_change_analyzer - INFO - Starting analysis of repository: https://github.com/XCTianer/transformer-models.git
+2025-07-07 09:34:11,206 - integrations.github_integration - INFO - Proxies disabled to avoid SOCKS issues
+2025-07-07 09:34:11,206 - integrations.github_integration - WARNING - No GitHub token provided - using unauthenticated API calls (limited rate)
+2025-07-07 09:34:15,632 - integrations.github_integration - INFO - Found latest commit: a2b3ad31 - Update GPT2 model implementation
+2025-07-07 09:34:15,632 - pipelines.code_change_analyzer - INFO - Analyzing only the latest commit: a2b3ad31
+2025-07-07 09:34:15,632 - pipelines.code_change_analyzer - INFO - Analyzing commit: a2b3ad31 - Update GPT2 model implementation
+2025-07-07 09:34:15,632 - pipelines.code_change_analyzer - INFO - Analyzing commit: a2b3ad31 - Update GPT2 model implementation
+2025-07-07 09:34:18,314 - pipelines.code_change_analyzer - INFO - Found 21 entities using normalized path match for +gpt2/model.m
+2025-07-07 09:34:19,554 - pipelines.code_change_analyzer - INFO - Found 21 entities and 51 relationships for nj/transformer-models/+gpt2/model.m
+2025-07-07 09:34:19,902 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Function: gpt2.model in +gpt2/model.m
+2025-07-07 09:34:20,469 - pipelines.code_change_analyzer - INFO - Found 21 dependency chains for gpt2.model
+2025-07-07 09:34:20,470 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: X in +gpt2/model.m
+2025-07-07 09:34:20,641 - pipelines.code_change_analyzer - INFO - Found 2 dependency chains for X
+2025-07-07 09:34:20,641 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: pasts in +gpt2/model.m
+2025-07-07 09:34:20,703 - pipelines.code_change_analyzer - INFO - Found 2 dependency chains for pasts
+2025-07-07 09:34:20,703 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: parameters in +gpt2/model.m
+2025-07-07 09:34:20,779 - pipelines.code_change_analyzer - INFO - Found 2 dependency chains for parameters
+2025-07-07 09:34:20,779 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: hyperparameters in +gpt2/model.m
+2025-07-07 09:34:20,898 - pipelines.code_change_analyzer - INFO - Found 3 dependency chains for hyperparameters
+2025-07-07 09:34:20,898 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: weights in +gpt2/model.m
+2025-07-07 09:34:20,938 - pipelines.code_change_analyzer - INFO - Found 4 dependency chains for weights
+2025-07-07 09:34:20,938 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: seqLen in +gpt2/model.m
+2025-07-07 09:34:20,966 - pipelines.code_change_analyzer - INFO - Found 2 dependency chains for seqLen
+2025-07-07 09:34:20,967 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: h in +gpt2/model.m
+2025-07-07 09:34:20,997 - pipelines.code_change_analyzer - INFO - Found 4 dependency chains for h
+2025-07-07 09:34:20,997 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: positionOffset in +gpt2/model.m
+2025-07-07 09:34:21,024 - pipelines.code_change_analyzer - INFO - Found 2 dependency chains for positionOffset
+2025-07-07 09:34:21,024 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: presents in +gpt2/model.m
+2025-07-07 09:34:21,052 - pipelines.code_change_analyzer - INFO - Found 2 dependency chains for presents
+2025-07-07 09:34:21,052 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: layerName in +gpt2/model.m
+2025-07-07 09:34:21,097 - pipelines.code_change_analyzer - INFO - Found 2 dependency chains for layerName
+2025-07-07 09:34:21,097 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: logits in +gpt2/model.m
+2025-07-07 09:34:21,124 - pipelines.code_change_analyzer - INFO - Found 2 dependency chains for logits
+2025-07-07 09:34:21,124 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: Hyperparameters in +gpt2/model.m
+2025-07-07 09:34:21,149 - pipelines.code_change_analyzer - INFO - No dependency chains found for Hyperparameters
+2025-07-07 09:34:21,149 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: Weights in +gpt2/model.m
+2025-07-07 09:34:21,204 - pipelines.code_change_analyzer - INFO - No dependency chains found for Weights
+2025-07-07 09:34:21,204 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: NumLayers in +gpt2/model.m
+2025-07-07 09:34:21,252 - pipelines.code_change_analyzer - INFO - No dependency chains found for NumLayers
+2025-07-07 09:34:21,252 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: present in +gpt2/model.m
+2025-07-07 09:34:21,281 - pipelines.code_change_analyzer - INFO - No dependency chains found for present
+2025-07-07 09:34:21,281 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: gpt2 in +gpt2/model.m
+2025-07-07 09:34:21,300 - pipelines.code_change_analyzer - INFO - No dependency chains found for gpt2
+2025-07-07 09:34:21,300 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Variable: layer in +gpt2/model.m
+2025-07-07 09:34:21,322 - pipelines.code_change_analyzer - INFO - No dependency chains found for layer
+2025-07-07 09:34:21,322 - pipelines.code_change_analyzer - INFO - Analyzing dependency chains for Script: model in +gpt2/model.m
+2025-07-07 09:34:21,364 - pipelines.code_change_analyzer - INFO - Found 20 dependency chains for model
+2025-07-07 09:34:21,364 - pipelines.code_change_analyzer - INFO - Total dependency chains found: 60
+2025-07-07 09:34:21,364 - tools.report_generator - INFO - Analysis report generated: analysis_output/代码变更记录影响范围分析报告.md
+2025-07-07 09:34:21,365 - tools.report_generator - INFO - Queries file generated: analysis_output/影响链路查询语句.cypher
+2025-07-07 09:34:21,368 - tools.report_generator - INFO - Neo4j links file generated: analysis_output/带查询语句的neo4j链接.md
+2025-07-07 09:34:21,368 - pipelines.code_change_analyzer - INFO - Analysis completed successfully
+2025-07-07 09:34:21,368 - main_analyzer - INFO - ✅ Analysis completed successfully!
+2025-07-07 09:34:21,368 - main_analyzer - INFO - 📁 Output files generated in: analysis_output
+2025-07-07 09:34:21,368 - main_analyzer - INFO - 📄 analysis_report: analysis_output/代码变更记录影响范围分析报告.md
+2025-07-07 09:34:21,368 - main_analyzer - INFO - 📄 queries_file: analysis_output/影响链路查询语句.cypher
+2025-07-07 09:34:21,369 - main_analyzer - INFO - 📄 neo4j_links: analysis_output/带查询语句的neo4j链接.md
+2025-07-07 09:34:21,369 - main_analyzer - INFO - 
+=== Analysis Summary ===
+2025-07-07 09:34:21,369 - main_analyzer - INFO - 📊 Total commits analyzed: 1
+2025-07-07 09:34:21,369 - main_analyzer - INFO - 📄 Total files changed: 1
+2025-07-07 09:34:21,369 - main_analyzer - INFO - 🔧 Affected functions: 1
+2025-07-07 09:34:21,369 - main_analyzer - INFO - 📝 Affected variables: 17
+2025-07-07 09:34:21,369 - main_analyzer - INFO - 📜 Affected scripts: 1
+2025-07-07 09:34:21,369 - main_analyzer - INFO - 🤖 LLM-enhanced analysis included in results

@@ -17,6 +17,9 @@ import { createCodeAssistContentGenerator } from '../code_assist/codeAssist.js';
 import { DEFAULT_GEMINI_MODEL } from '../config/models.js';
 import { getEffectiveModel } from './modelCheck.js';
 import { DeepseekAdapter } from './deepseekAdapter.js';
+import { ToolRegistry } from '../tools/tool-registry.js';
+import { Config } from '../config/config.js';
+import fs from 'fs';
 
 /**
  * Interface abstracting the core functionalities for generating content and counting tokens.
@@ -102,6 +105,8 @@ export async function createContentGeneratorConfig(
 
 export async function createContentGenerator(
   config: ContentGeneratorConfig,
+  toolRegistry?: ToolRegistry,
+  appConfig?: Config,
 ): Promise<ContentGenerator> {
   const version = process.env.CLI_VERSION || process.version;
   const httpOptions = {
@@ -113,16 +118,23 @@ export async function createContentGenerator(
   // 从环境变量获取provider，默认为gemini
   const provider = process.env.GEMINI_PROVIDER || 'gemini';
   
-  console.log(`🔍 Debug: Provider = ${provider}, GEMINI_PROVIDER = ${process.env.GEMINI_PROVIDER}`);
+  debugLog(`🔍 Debug: Provider = ${provider}, GEMINI_PROVIDER = ${process.env.GEMINI_PROVIDER}`);
 
   if (provider === 'deepseek') {
     const apiKey = process.env.DEEPSEEK_API_KEY;
-    console.log(`🔍 Debug: DEEPSEEK_API_KEY = ${apiKey ? 'SET' : 'NOT SET'}`);
+    debugLog(`🔍 Debug: DEEPSEEK_API_KEY = ${apiKey ? 'SET' : 'NOT SET'}`);
     if (!apiKey) {
       throw new Error('DEEPSEEK_API_KEY environment variable is required for Deepseek provider');
     }
-    console.log('🔍 Debug: Using real Deepseek adapter');
-    return new DeepseekAdapter(apiKey);
+    debugLog('🔍 Debug: Using real Deepseek adapter');
+    const adapter = new DeepseekAdapter(apiKey);
+    
+    // 如果提供了工具注册表和配置，设置到适配器中
+    if (toolRegistry && appConfig) {
+      adapter.setToolRegistry(toolRegistry, appConfig);
+    }
+    
+    return adapter;
   }
 
   if (provider !== 'gemini') {
@@ -186,4 +198,20 @@ export async function createContentGenerator(
   throw new Error(
     `Error creating contentGenerator: Unsupported authType: ${config.authType}`,
   );
+}
+
+// 调试日志函数
+function debugLog(msg: string, obj?: any) {
+  const logEntry = msg + (obj ? ' ' + JSON.stringify(obj, null, 2) : '') + '\n';
+  try {
+    fs.appendFileSync('/tmp/gemini-debug.log', logEntry);
+  } catch (error) {
+    // 如果无法写入文件，尝试写入当前目录
+    try {
+      fs.appendFileSync('./gemini-debug.log', logEntry);
+    } catch (e) {
+      // 最后尝试写入stderr
+      console.error(logEntry);
+    }
+  }
 }

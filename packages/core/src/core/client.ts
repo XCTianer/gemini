@@ -66,8 +66,11 @@ export class GeminiClient {
   }
 
   async initialize(contentGeneratorConfig: ContentGeneratorConfig) {
+    const toolRegistry = await this.config.getToolRegistry();
     this.contentGenerator = await createContentGenerator(
       contentGeneratorConfig,
+      toolRegistry,
+      this.config,
     );
     this.chat = await this.startChat();
   }
@@ -342,6 +345,10 @@ export class GeminiClient {
     generationConfig: GenerateContentConfig,
     abortSignal: AbortSignal,
   ): Promise<GenerateContentResponse> {
+    // 添加调试日志
+    const fs = await import('fs');
+    fs.appendFileSync('/tmp/gemini-debug.log', `🔍 Debug: client.generateContent called with model: ${this.model}\n`);
+    
     const modelToUse = this.model;
     const configToUse: GenerateContentConfig = {
       ...this.generateContentConfig,
