@@ -18,6 +18,7 @@ import { createCodeAssistContentGenerator } from '../code_assist/codeAssist.js';
 import { DEFAULT_GEMINI_MODEL } from '../config/models.js';
 import { getEffectiveModel } from './modelCheck.js';
 import { DeepseekAdapter } from './deepseekAdapter.js';
+import { LocalDeepseekAdapter } from './localDeepseekAdapter.js';
 import { OllamaAdapter } from './ollamaAdapter.js';
 
 /**
@@ -120,7 +121,15 @@ export async function createContentGenerator(
     if (!apiKey) {
       throw new Error('DEEPSEEK_API_KEY environment variable is required for Deepseek provider');
     }
-    return new DeepseekAdapter(apiKey);
+    const baseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';
+    return new DeepseekAdapter(apiKey, baseUrl);
+  }
+
+  if (provider === 'local-deepseek') {
+    const apiKey = process.env.DEEPSEEK_API_KEY || '';
+    const baseUrl = process.env.DEEPSEEK_BASE_URL || 'http://localhost:8000';
+    const timeout = parseInt(process.env.DEEPSEEK_TIMEOUT || '30000');
+    return new LocalDeepseekAdapter(apiKey, baseUrl, timeout);
   }
 
   if (provider === 'ollama') {
