@@ -414,6 +414,9 @@ export class DeepseekAdapter implements ContentGenerator {
     const googleTools = config?.tools || requestAny?.tools;
     const deepseekTools = this.convertToDeepseekTools(googleTools as unknown[]);
     
+    // 检查是否是JSON生成请求
+    const isJsonRequest = config?.responseMimeType === 'application/json' || config?.responseSchema;
+    
     const requestObj: DeepseekRequest = {
       model: (requestAny?.model as string) || 'deepseek-chat',
       messages,
@@ -421,6 +424,14 @@ export class DeepseekAdapter implements ContentGenerator {
       temperature: config?.temperature as number,
       max_tokens: config?.maxOutputTokens as number,
     };
+    
+    // 如果是JSON请求，添加格式要求到系统消息
+    if (isJsonRequest && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.role === 'user') {
+        lastMessage.content += '\n\n请严格按照JSON格式回复，不要包含任何其他文本，不要使用markdown代码块。';
+      }
+    }
     
     // 只有当有工具时才添加 tools 字段
     if (deepseekTools.length > 0) {
@@ -438,6 +449,9 @@ export class DeepseekAdapter implements ContentGenerator {
     const googleTools = config?.tools || requestAny?.tools;
     const deepseekTools = this.convertToDeepseekTools(googleTools as unknown[]);
     
+    // 检查是否是JSON生成请求
+    const isJsonRequest = config?.responseMimeType === 'application/json' || config?.responseSchema;
+    
     const deepseekRequest: DeepseekRequest = {
       model: (requestAny?.model as string) || 'deepseek-chat',
       messages,
@@ -445,6 +459,14 @@ export class DeepseekAdapter implements ContentGenerator {
       temperature: config?.temperature as number,
       max_tokens: config?.maxOutputTokens as number,
     };
+    
+    // 如果是JSON请求，添加格式要求到系统消息
+    if (isJsonRequest && messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.role === 'user') {
+        lastMessage.content += '\n\n请严格按照JSON格式回复，不要包含任何其他文本，不要使用markdown代码块。';
+      }
+    }
     
     // 只有当有工具时才添加 tools 字段
     if (deepseekTools.length > 0) {

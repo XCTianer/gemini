@@ -34,6 +34,7 @@ import { formatDuration, formatMemoryUsage } from '../utils/formatters.js';
 import { getCliVersion } from '../../utils/version.js';
 import { LoadedSettings } from '../../config/settings.js';
 
+
 export interface SlashCommandActionReturn {
   shouldScheduleTool?: boolean;
   toolName?: string;
@@ -85,6 +86,8 @@ export const useSlashCommandProcessor = (
     }
     return new GitService(config.getProjectRoot());
   }, [config]);
+
+
 
   const pendingHistoryItems: HistoryItemWithoutId[] = [];
   const [pendingCompressionItemRef, setPendingCompressionItem] =

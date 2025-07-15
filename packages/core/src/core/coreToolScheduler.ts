@@ -230,6 +230,10 @@ export class CoreToolScheduler {
   private approvalMode: ApprovalMode;
   private getPreferredEditor: () => EditorType | undefined;
   private config: Config;
+  
+  // 添加去重机制
+  private recentToolCalls: Map<string, { timestamp: number, callId: string }> = new Map();
+  private readonly DEDUP_WINDOW_MS = 10000; // 10秒内的相同调用视为重复
 
   constructor(options: CoreToolSchedulerOptions) {
     this.config = options.config;
@@ -398,6 +402,58 @@ export class CoreToolScheduler {
     );
   }
 
+  /**
+   * 检查是否为重复的工具调用
+   */
+  private isDuplicateToolCall(toolName: string, args: unknown): boolean {
+    const key = `${toolName}_${JSON.stringify(args)}`;
+    const now = Date.now();
+    const recent = this.recentToolCalls.get(key);
+    
+    if (recent && (now - recent.timestamp) < this.DEDUP_WINDOW_MS) {
+      console.log(`Duplicate tool call detected: ${toolName} with args ${JSON.stringify(args)}`);
+      return true;
+    }
+    
+    // 清理过期的记录
+    this.cleanupOldToolCalls(now);
+    
+    return false;
+  }
+
+  /**
+   * 检查当前是否有正在执行的相同工具调用
+   */
+  private isCurrentlyExecuting(toolName: string, args: unknown): boolean {
+    const key = `${toolName}_${JSON.stringify(args)}`;
+    return this.toolCalls.some(call => {
+      if (call.request.name === toolName && JSON.stringify(call.request.args) === JSON.stringify(args)) {
+        return call.status === 'validating' || call.status === 'scheduled' || call.status === 'executing' || call.status === 'awaiting_approval';
+      }
+      return false;
+    });
+  }
+
+  /**
+   * 记录工具调用，用于去重
+   */
+  private recordToolCall(toolName: string, args: unknown): void {
+    const key = `${toolName}_${JSON.stringify(args)}`;
+    const now = Date.now();
+    this.recentToolCalls.set(key, { timestamp: now, callId: `dedup_${Date.now()}` });
+  }
+
+  /**
+   * 清理过期的工具调用记录
+   */
+  private cleanupOldToolCalls(now: number): void {
+    for (const [key, value] of this.recentToolCalls.entries()) {
+      if (now - value.timestamp > this.DEDUP_WINDOW_MS) {
+        this.recentToolCalls.delete(key);
+      }
+    }
+  }
+
   async schedule(
     request: ToolCallRequestInfo | ToolCallRequestInfo[],
     signal: AbortSignal,
@@ -424,6 +480,59 @@ export class CoreToolScheduler {
             durationMs: 0,
           };
         }
+        
+        // 检查是否为重复调用
+        if (this.isDuplicateToolCall(reqInfo.name, reqInfo.args)) {
+          return {
+            status: 'cancelled',
+            request: reqInfo,
+            tool: toolInstance,
+            response: {
+              callId: reqInfo.callId,
+              responseParts: [
+                {
+                  functionResponse: {
+                    id: reqInfo.callId,
+                    name: reqInfo.name,
+                    response: { 
+                      output: `Duplicate tool call detected: ${reqInfo.name} was called recently with the same arguments. Skipping execution.` 
+                    },
+                  },
+                },
+              ],
+              resultDisplay: `重复的工具调用已跳过: ${reqInfo.name}`,
+              error: undefined,
+            },
+            durationMs: 0,
+          };
+        }
+
+        // 检查是否正在执行相同的工具调用
+        if (this.isCurrentlyExecuting(reqInfo.name, reqInfo.args)) {
+          return {
+            status: 'cancelled',
+            request: reqInfo,
+            tool: toolInstance,
+            response: {
+              callId: reqInfo.callId,
+              responseParts: [
+                {
+                  functionResponse: {
+                    id: reqInfo.callId,
+                    name: reqInfo.name,
+                    response: { 
+                      output: `Tool ${reqInfo.name} is currently being executed with the same arguments. Skipping duplicate execution.` 
+                    },
+                  },
+                },
+              ],
+              resultDisplay: `工具正在执行中，跳过重复调用: ${reqInfo.name}`,
+              error: undefined,
+            },
+            durationMs: 0,
+          };
+        }
+        
         return {
           status: 'validating',
           request: reqInfo,
@@ -598,6 +707,9 @@ export class CoreToolScheduler {
               return;
             }
 
+            // 记录成功的工具调用，用于去重
+            this.recordToolCall(toolName, scheduledCall.request.args);
+
             const response = convertToFunctionResponse(
               toolName,
               callId,
@@ -611,6 +723,9 @@ export class CoreToolScheduler {
               error: undefined,
             };
             this.setStatusInternal(callId, 'success', successResponse);
+            
+            // 检查是否所有工具调用都已完成
+            this.checkAndNotifyCompletion();
           })
           .catch((executionError: Error) => {
             this.setStatusInternal(
@@ -623,6 +738,9 @@ export class CoreToolScheduler {
                   : new Error(String(executionError)),
               ),
             );
+            
+            // 检查是否所有工具调用都已完成
+            this.checkAndNotifyCompletion();
           });
       });
     }

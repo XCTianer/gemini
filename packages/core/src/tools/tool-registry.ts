@@ -10,6 +10,7 @@ import { Config } from '../config/config.js';
 import { spawn, execSync } from 'node:child_process';
 import { discoverMcpTools } from './mcp-client.js';
 import { DiscoveredMCPTool } from './mcp-tool.js';
+import { DiscoveredMCPToolWithSummary } from './mcp-tool-with-summary.js';
 
 type ToolParams = Record<string, unknown>;
 
@@ -151,7 +152,7 @@ export class ToolRegistry {
   async discoverTools(): Promise<void> {
     // remove any previously discovered tools
     for (const tool of this.tools.values()) {
-      if (tool instanceof DiscoveredTool || tool instanceof DiscoveredMCPTool) {
+      if (tool instanceof DiscoveredTool || tool instanceof DiscoveredMCPTool || tool instanceof DiscoveredMCPToolWithSummary) {
         this.tools.delete(tool.name);
       } else {
         // Keep manually registered tools

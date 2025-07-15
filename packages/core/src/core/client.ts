@@ -256,6 +256,17 @@ export class GeminiClient {
     model: string = DEFAULT_GEMINI_FLASH_MODEL,
     config: GenerateContentConfig = {},
   ): Promise<Record<string, unknown>> {
+    // 根据provider选择合适的默认模型
+    const provider = process.env.GEMINI_PROVIDER || 'gemini';
+    let modelToUse = model;
+    
+    if (provider === 'deepseek' && model === DEFAULT_GEMINI_FLASH_MODEL) {
+      // 如果使用DeepSeek且是默认模型，则使用deepseek-chat
+      modelToUse = 'deepseek-chat';
+    } else if (provider === 'ollama' && model === DEFAULT_GEMINI_FLASH_MODEL) {
+      // 如果使用Ollama且是默认模型，则使用llama3.2
+      modelToUse = 'llama3.2';
+    }
     try {
       const userMemory = this.config.getUserMemory();
       const systemInstruction = getCoreSystemPrompt(userMemory);
@@ -267,7 +278,7 @@ export class GeminiClient {
 
       const apiCall = () =>
         this.getContentGenerator().generateContent({
-          model,
+          model: modelToUse,
           config: {
             ...requestConfig,
             systemInstruction,
@@ -296,14 +307,25 @@ export class GeminiClient {
         );
         throw error;
       }
+      
+      // 处理markdown代码块包装的JSON响应（主要是DeepSeek模型）
+      let jsonText = text.trim();
+      
+      // 检查是否被markdown代码块包装
+      const jsonCodeBlockMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      if (jsonCodeBlockMatch) {
+        jsonText = jsonCodeBlockMatch[1].trim();
+      }
+      
       try {
-        return JSON.parse(text);
+        return JSON.parse(jsonText);
       } catch (parseError) {
         await reportError(
           parseError,
           'Failed to parse JSON response from generateJson.',
           {
             responseTextFailedToParse: text,
+            processedJsonText: jsonText,
             originalRequestContents: contents,
           },
           'generateJson-parse',

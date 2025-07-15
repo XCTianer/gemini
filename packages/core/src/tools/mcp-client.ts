@@ -14,6 +14,7 @@ import {
 import { parse } from 'shell-quote';
 import { MCPServerConfig } from '../config/config.js';
 import { DiscoveredMCPTool } from './mcp-tool.js';
+import { DiscoveredMCPToolWithSummary } from './mcp-tool-with-summary.js';
 import {
   CallableTool,
   FunctionDeclaration,
@@ -325,8 +326,15 @@ async function connectAndDiscover(
           ? { ...(funcDecl.parameters as FunctionDeclaration) }
           : { type: 'object', properties: {} };
 
+      // Use enhanced MCP tool with automatic summary generation for analysis tools
+      const isAnalysisTool = shouldUseSummaryTool(funcDecl.name);
+      const ToolClass = isAnalysisTool ? DiscoveredMCPToolWithSummary : DiscoveredMCPTool;
+
+      // Get config from tool registry for LLM analysis
+      const config = (toolRegistry as any).config;
+
       toolRegistry.registerTool(
-        new DiscoveredMCPTool(
+        new ToolClass(
           mcpCallableTool,
           mcpServerName,
           toolNameForModel,
@@ -335,6 +343,7 @@ async function connectAndDiscover(
           funcDecl.name,
           mcpServerConfig.timeout ?? MCP_DEFAULT_TIMEOUT_MSEC,
           mcpServerConfig.trust,
+          config, // Pass config for LLM analysis
         ),
       );
     }
@@ -373,6 +382,30 @@ async function connectAndDiscover(
       updateMCPServerStatus(mcpServerName, MCPServerStatus.DISCONNECTED);
     }
   }
+}
+
+/**
+ * Determines if a tool should use the enhanced summary generation functionality
+ * Tools with analysis-related names will automatically generate structured summaries
+ */
+function shouldUseSummaryTool(toolName: string): boolean {
+  // Tools that need LLM summary generation
+  const analysisTools = [
+    'analyze_code_changes',
+    'get_impact_chains',
+    'get_file_impact', 
+    'get_commit_analysis',
+    'get_neo4j_queries',
+    'get_direct_mode_status',
+    'code_analysis',
+    'impact_analysis',
+    'analyze',
+    'analysis'
+  ];
+
+  return analysisTools.some(analysisTool => 
+    toolName.toLowerCase().includes(analysisTool)
+  );
 }
 
 export function sanitizeParameters(schema?: Schema) {
